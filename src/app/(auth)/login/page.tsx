@@ -3,8 +3,10 @@ import { getMetadata } from "@/lib/metadata";
 
 export const metadata = getMetadata({
   title: "Masuk | Nusa Dakwah",
-  description: "Masuk untuk mengakses fitur-fitur yang tersedia.",
+  description:
+    "Platform pembelajaran dan dakwah digital untuk memberdayakan umat melalui konten edukatif dan inspiratif.",
   url: "https://nusadakwah.creatify.id/login",
+  image: "https://nusadakwah.creatify.id/images/logo.jpg",
   keywords: ["Masuk", "Login", "Nusa Dakwah", "Dakwah Digital"],
   siteName: "Masuk | Nusa Dakwah",
   type: "website",
