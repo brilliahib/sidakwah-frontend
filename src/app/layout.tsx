@@ -15,7 +15,7 @@ export const metadata: Metadata = getMetadata({
   description:
     "Platform pembelajaran dan dakwah digital untuk memberdayakan umat melalui konten edukatif dan inspiratif.",
   url: "https://nusadakwah.creatify.id",
-  image: "https://nusadakwah.creatify.id/images/logo.jpg",
+  image: "https://nusadakwah.creatify.id/images/logo.png",
   keywords: [
     "Nusa Dakwah",
     "Dakwah Digital",
