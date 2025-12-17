@@ -1,8 +1,8 @@
-import FormAuthLogin from "@/components/molecules/form/auth/FormAuthLogin";
+import FormAuthRegister from "@/components/molecules/form/auth/FormAuthRegister";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function AuthLoginWrapper() {
+export default function AuthRegisterWrapper() {
   return (
     <div className="relative min-h-screen flex-col md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div
@@ -26,6 +26,7 @@ export default function AuthLoginWrapper() {
             />
           </Link>
         </div>
+
         <div className="relative z-20 mt-auto hidden lg:block">
           <blockquote className="space-y-2">
             <p className="max-w-md text-lg">
@@ -37,7 +38,7 @@ export default function AuthLoginWrapper() {
       </div>
       <div className="flex flex-1 items-center p-4 lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center gap-y-4 sm:w-[350px]">
-          <FormAuthLogin />
+          <FormAuthRegister />
         </div>
       </div>
     </div>

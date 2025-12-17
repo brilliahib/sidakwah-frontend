@@ -181,55 +181,22 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      className={buttonClass("/dashboard/nakes/patients")}
+                      className={buttonClass("/dashboard/modules")}
                     >
-                      <Link href="/dashboard/nakes/patients">
-                        <Users />
-                        <span>Pasien</span>
+                      <Link href="/dashboard/modules">
+                        <Book />
+                        <span>Modul</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      className={buttonClass("/dashboard/nakes/monitoring")}
+                      className={buttonClass("/dashboard/discussions")}
                     >
-                      <Link href="/dashboard/nakes/monitoring">
-                        <Rss />
-                        <span>Monitoring EMG</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      className={buttonClass("/dashboard/nakes/reports")}
-                    >
-                      <Link href="/dashboard/nakes/reports">
-                        <TriangleAlert />
-                        <span>Laporan Perkembangan</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      className={buttonClass("/dashboard/nakes/schedules")}
-                    >
-                      <Link href="/dashboard/nakes/schedules">
-                        <CalendarFold />
-                        <span>Jadwal Terapis</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      className={buttonClass("/dashboard/nakes/therapists")}
-                    >
-                      <Link href="/dashboard/nakes/therapists">
-                        <Speech />
-                        <span>Terapis Semantik</span>
+                      <Link href="/dashboard/discussions">
+                        <MessageCircleMore />
+                        <span>Forum Diskusi</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
