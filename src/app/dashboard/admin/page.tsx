@@ -8,10 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardAdminPage() {
-  return (
-    <DashboardTitle
-      head="Dashboard Admin"
-      body="Selamat datang di halaman dashboard admin Nusa Dakwah"
-    />
-  );
+  return <DashboardTitle title="Dashboard Admin" />;
 }
