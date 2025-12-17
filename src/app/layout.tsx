@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
+import GlobalProvider from "@/components/organisms/GlobalProvider";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${rubik.variable} antialiased`}>{children}</body>
+      <body className={`${rubik.variable} antialiased`}>
+        <GlobalProvider>{children}</GlobalProvider>
+      </body>
     </html>
   );
 }

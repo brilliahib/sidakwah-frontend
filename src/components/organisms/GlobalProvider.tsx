@@ -1,7 +1,6 @@
 "use client";
 
 import { PropsWithChildren, useEffect, useState } from "react";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
@@ -21,7 +20,7 @@ export default function GlobalProvider({ children }: PropsWithChildren) {
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
-        {mounted && <Toaster position="top-right" richColors closeButton />}
+        {mounted && <Toaster />}
       </SessionProvider>
     </>
   );
