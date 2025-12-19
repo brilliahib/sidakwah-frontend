@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, FilePlay, SquarePen, Trash2, Video } from "lucide-react";
 import ActionButton from "@/components/molecules/datatable/ActionButton";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -50,9 +50,9 @@ export const materialContentColumns: ColumnDef<MaterialContent>[] = [
       }
 
       return (
-        <p suppressHydrationWarning className="line-clamp-1 md:line-clamp-2">
-          {youtubeLink}
-        </p>
+        <Link href={row.original.youtube_link!} target="_blank">
+          <FilePlay className="h-5 w-5 text-primary" />
+        </Link>
       );
     },
   },
