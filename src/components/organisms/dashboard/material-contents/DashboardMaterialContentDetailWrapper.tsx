@@ -3,6 +3,7 @@
 import DashboardTitle from "@/components/atoms/typography/DashboardTitle";
 import CardListComment from "@/components/molecules/comment/CardListComment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllComment } from "@/http/comments/get-all-comment";
 import { useGetDetailMaterialContent } from "@/http/material-contents/get-detail-material-content";
 import { useSession } from "next-auth/react";
@@ -36,11 +37,17 @@ export default function DashboardMaterialContentDetailWrapper({
     <div>
       <DashboardTitle title={data?.data.title} isPending={isPending} />
       <div className="space-y-6">
-        {data?.data.youtube_link && (
-          <iframe
-            src={data?.data.youtube_link}
-            className="aspect-video w-full rounded-lg"
-          />
+        {isPending ? (
+          <Skeleton className="aspect-video w-full rounded-lg" />
+        ) : (
+          data?.data.youtube_link && (
+            <iframe
+              src={data?.data.youtube_link}
+              className="aspect-video w-full rounded-lg"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          )
         )}
         <div>
           <Tabs defaultValue="discussion">
@@ -52,6 +59,7 @@ export default function DashboardMaterialContentDetailWrapper({
               <CardListComment
                 data={comment?.data}
                 materialContentId={contentId}
+                isLoading={isCommentPending}
               />
             </TabsContent>
             {data?.data.article_content && (

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Form,
   FormControl,
@@ -35,15 +36,17 @@ import { useQueryClient } from "@tanstack/react-query";
 interface CardListCommentProps {
   data?: Comment[];
   materialContentId: number;
+  isLoading?: boolean;
 }
 
 export default function CardListComment({
   data,
   materialContentId,
+  isLoading = false,
 }: CardListCommentProps) {
   const { data: session } = useSession();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [collapsedComments, setCollapsedComments] = useState<Set<number>>(
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(
     new Set()
   );
 
@@ -78,14 +81,14 @@ export default function CardListComment({
       .slice(0, 2);
   };
 
-  const toggleCollapse = (commentId: number) => {
-    const newCollapsed = new Set(collapsedComments);
-    if (newCollapsed.has(commentId)) {
-      newCollapsed.delete(commentId);
+  const toggleExpand = (commentId: number) => {
+    const newExpanded = new Set(expandedComments);
+    if (newExpanded.has(commentId)) {
+      newExpanded.delete(commentId);
     } else {
-      newCollapsed.add(commentId);
+      newExpanded.add(commentId);
     }
-    setCollapsedComments(newCollapsed);
+    setExpandedComments(newExpanded);
   };
 
   const handleReply = (commentId: number) => {
@@ -168,6 +171,26 @@ export default function CardListComment({
     );
   };
 
+  // Skeleton Loading Component
+  const CommentSkeleton = ({ depth = 0 }: { depth?: number }) => (
+    <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
+      <div className="flex gap-3">
+        <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+        <div className="flex-1 space-y-3">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="h-16 w-full" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const CommentItem = ({
     comment,
     depth = 0,
@@ -176,7 +199,7 @@ export default function CardListComment({
     depth?: number;
   }) => {
     const hasReplies = comment.replies && comment.replies.length > 0;
-    const isCollapsed = collapsedComments.has(comment.id);
+    const isExpanded = expandedComments.has(comment.id);
     const isCurrentlyReplying = replyingTo === comment.id;
     const totalReplies = countTotalReplies(comment);
 
@@ -191,6 +214,10 @@ export default function CardListComment({
       return `border-l-2 pl-4`;
     };
 
+    const isOwner =
+      session?.user?.id !== undefined &&
+      String(session.user.id) === String(comment.user.id);
+
     return (
       <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
         <div className={`flex gap-3 group ${getDepthStyles()}`}>
@@ -204,6 +231,13 @@ export default function CardListComment({
               <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
                 {comment.user.name}
               </span>
+
+              {isOwner && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                  Anda
+                </span>
+              )}
+
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {formatTimeAgo(comment.created_at)}
               </span>
@@ -228,15 +262,15 @@ export default function CardListComment({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => toggleCollapse(comment.id)}
+                  onClick={() => toggleExpand(comment.id)}
                 >
-                  {isCollapsed ? (
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                  ) : (
+                  {isExpanded ? (
                     <ChevronUp className="w-4 h-4 mr-1" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 mr-1" />
                   )}
                   <span className="text-xs font-medium">
-                    {isCollapsed ? "Tampilkan" : "Sembunyikan"} {totalReplies}{" "}
+                    {isExpanded ? "Sembunyikan" : "Tampilkan"} {totalReplies}{" "}
                     balasan
                   </span>
                 </Button>
@@ -277,11 +311,18 @@ export default function CardListComment({
                             <FormItem>
                               <FormControl>
                                 <Textarea
-                                  {...field}
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  onBlur={field.onBlur}
+                                  name={field.name}
                                   placeholder={`Balas ke ${comment.user.name}...`}
                                   className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm"
                                   autoFocus
                                   disabled={isCreatingReply}
+                                  style={{
+                                    direction: "ltr",
+                                    unicodeBidi: "plaintext",
+                                  }}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -326,7 +367,7 @@ export default function CardListComment({
               </div>
             )}
 
-            {hasReplies && !isCollapsed && (
+            {hasReplies && isExpanded && (
               <div className="mt-4 space-y-4">
                 {comment.replies?.map((reply) => (
                   <CommentItem
@@ -354,9 +395,13 @@ export default function CardListComment({
           <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
             Diskusi
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {data?.length || 0} komentar
-          </p>
+          {isLoading ? (
+            <Skeleton className="h-4 w-24 mt-1" />
+          ) : (
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {data?.length || 0} komentar
+            </p>
+          )}
         </div>
       </div>
 
@@ -381,10 +426,14 @@ export default function CardListComment({
                   <FormItem>
                     <FormControl>
                       <Textarea
-                        {...field}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
                         placeholder="Tulis komentar Anda di sini..."
                         className="min-h-[120px] text-sm resize-none bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 shadow-sm rounded-xl"
                         disabled={isCreatingComment}
+                        style={{ direction: "ltr", unicodeBidi: "plaintext" }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -418,7 +467,17 @@ export default function CardListComment({
       </div>
 
       {/* Comments List */}
-      {!data || data.length === 0 ? (
+      {isLoading ? (
+        <Card className="p-6 rounded-xl shadow-sm">
+          <div className="space-y-6">
+            <CommentSkeleton />
+            <div className="border-b-2 border-gray-100 dark:border-gray-800" />
+            <CommentSkeleton />
+            <div className="border-b-2 border-gray-100 dark:border-gray-800" />
+            <CommentSkeleton />
+          </div>
+        </Card>
+      ) : !data || data.length === 0 ? (
         <Card>
           <div className="max-w-md mx-auto">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
