@@ -105,7 +105,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
 
         {session?.user.role === "admin" && (
           <>
-            {/* Menu utama */}
+            {/* admin roles group */}
             <SidebarGroup>
               <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
               <SidebarGroupContent>
@@ -162,6 +162,17 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          asChild
+                          className={buttonClass("/dashboard/admin/users")}
+                        >
+                          <Link href="/dashboard/admin/users">
+                            <Users />
+                            <span>Pengguna</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
                     </>
                   )}
                 </SidebarMenu>
@@ -170,7 +181,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
           </>
         )}
 
-        {/* Admin-only groups */}
+        {/* user roles groups */}
         {session?.user.role === "user" && (
           <>
             {/* Konten */}
