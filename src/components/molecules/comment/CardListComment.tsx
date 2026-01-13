@@ -478,32 +478,28 @@ export default function CardListComment({
           </div>
         </Card>
       ) : !data || data.length === 0 ? (
-        <Card>
-          <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
-              <MessageSquare className="w-10 h-10 text-white" />
-            </div>
-            <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg mb-2">
-              Belum ada komentar
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Jadilah yang pertama memulai diskusi!
-            </p>
+        <div className="max-w-md mx-auto">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
+            <MessageSquare className="w-10 h-10 text-white" />
           </div>
-        </Card>
+          <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg mb-2">
+            Belum ada komentar
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Jadilah yang pertama memulai diskusi!
+          </p>
+        </div>
       ) : (
-        <Card className="p-6 rounded-xl shadow-sm">
-          <div className="space-y-6">
-            {parentComments.map((comment, index) => (
-              <div key={comment.id}>
-                <CommentItem comment={comment} />
-                {index < parentComments.length - 1 && (
-                  <div className="border-b-2 border-gray-100 dark:border-gray-800 mt-6" />
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
+        <div className="space-y-6">
+          {parentComments.map((comment, index) => (
+            <div key={comment.id}>
+              <CommentItem comment={comment} />
+              {index < parentComments.length - 1 && (
+                <div className="border-b-2 border-gray-100 dark:border-gray-800 mt-6" />
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
