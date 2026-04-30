@@ -13,7 +13,13 @@ import {
 import { MaterialContent } from "@/types/material-contents/material-content";
 import { Badge } from "@/components/ui/badge";
 
-export const materialContentColumns: ColumnDef<MaterialContent>[] = [
+interface AlertDialogDeleteMaterialContentProps {
+  deleteMaterialContentHandler: (data: MaterialContent) => void;
+}
+
+export const materialContentColumns = (
+  props: AlertDialogDeleteMaterialContentProps,
+): ColumnDef<MaterialContent>[] => [
   {
     accessorKey: "index",
     header: "No",
@@ -103,13 +109,19 @@ export const materialContentColumns: ColumnDef<MaterialContent>[] = [
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <div className="flex cursor-pointer items-center text-yellow-700 hover:underline">
+            <Link
+              href={`/dashboard/admin/material-contents/${data.id}/edit`}
+              className="flex cursor-pointer items-center text-yellow-700 hover:underline"
+            >
               <SquarePen className="h-4 w-4 text-yellow-700" />
               <span className="ml-2">Edit</span>
-            </div>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <div className="flex cursor-pointer items-center text-red-600 hover:text-red-800 hover:underline">
+            <div
+              className="flex cursor-pointer items-center text-red-600 hover:text-red-800 hover:underline"
+              onClick={() => props.deleteMaterialContentHandler(data)}
+            >
               <Trash2 className="h-4 w-4 text-red-600" />
               <span className="ml-2">Hapus</span>
             </div>
