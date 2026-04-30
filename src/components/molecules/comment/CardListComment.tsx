@@ -47,7 +47,7 @@ export default function CardListComment({
   const { data: session } = useSession();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [expandedComments, setExpandedComments] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
 
   const queryClient = useQueryClient();
@@ -59,7 +59,7 @@ export default function CardListComment({
     const now = new Date();
     const commentDate = new Date(date);
     const diffInSeconds = Math.floor(
-      (now.getTime() - commentDate.getTime()) / 1000
+      (now.getTime() - commentDate.getTime()) / 1000,
     );
 
     if (diffInSeconds < 60) return "baru saja";
@@ -167,7 +167,7 @@ export default function CardListComment({
     if (!comment.replies || comment.replies.length === 0) return 0;
     return comment.replies.reduce(
       (total, reply) => total + 1 + countTotalReplies(reply),
-      0
+      0,
     );
   };
 
@@ -478,7 +478,7 @@ export default function CardListComment({
           </div>
         </Card>
       ) : !data || data.length === 0 ? (
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto text-center py-12">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
             <MessageSquare className="w-10 h-10 text-white" />
           </div>
