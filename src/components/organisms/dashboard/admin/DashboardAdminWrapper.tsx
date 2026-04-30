@@ -1,11 +1,10 @@
 "use client";
 
-import DashboardTitle from "@/components/atoms/typography/DashboardTitle";
 import CardDashboardSummary from "@/components/molecules/card/dashboard/CardDashboardSummary";
 import { useGetDashboardSummary } from "@/http/dashboard/get-dashboard-summary";
 import { useSession } from "next-auth/react";
 
-export default function DashboardContent() {
+export default function DashboardAdminWrapper() {
   const { data: session, status } = useSession();
 
   const { data, isPending } = useGetDashboardSummary(
@@ -17,7 +16,6 @@ export default function DashboardContent() {
 
   return (
     <section>
-      <DashboardTitle title="Dashboard" />
       <CardDashboardSummary data={data?.data} isPending={isPending} />
     </section>
   );
