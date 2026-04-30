@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SubModules } from "@/types/sub-modules/sub-modules";
 
-export const subModulesColumns: ColumnDef<SubModules>[] = [
+interface DataSubModulesProps {
+  deleteSubModuleHandler: (data: SubModules) => void;
+}
+
+export const subModulesColumns = (
+  props: DataSubModulesProps,
+): ColumnDef<SubModules>[] => [
   {
     accessorKey: "index",
     header: "No",
@@ -88,13 +94,19 @@ export const subModulesColumns: ColumnDef<SubModules>[] = [
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <div className="flex cursor-pointer items-center text-yellow-700 hover:underline">
+            <Link
+              href={`/dashboard/admin/sub-modules/${data.id}/edit`}
+              className="flex cursor-pointer items-center text-yellow-700 hover:underline"
+            >
               <SquarePen className="h-4 w-4 text-yellow-700" />
               <span className="ml-2">Edit</span>
-            </div>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <div className="flex cursor-pointer items-center text-red-600 hover:text-red-800 hover:underline">
+            <div
+              className="flex cursor-pointer items-center text-red-600 hover:text-red-800 hover:underline"
+              onClick={() => props.deleteSubModuleHandler(data)}
+            >
               <Trash2 className="h-4 w-4 text-red-600" />
               <span className="ml-2">Hapus</span>
             </div>

@@ -1,30 +1,69 @@
 "use client";
 
+import AlertDialogDeleteSubModule from "@/components/atoms/alert-dialog/sub-modules/AlertDialogDeleteSubModule";
 import { subModulesColumns } from "@/components/atoms/datacolumn/DataSubModules";
 import SearchBar from "@/components/atoms/search/Searchbar";
 import { DataTable } from "@/components/molecules/datatable/DataTable";
 import { Button } from "@/components/ui/button";
+import { useDeleteSubModule } from "@/http/sub-modules/delete-sub-modules";
 import { useGetAllSubModules } from "@/http/sub-modules/get-all-sub-modules";
 import { SubModules } from "@/types/sub-modules/sub-modules";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function DashboardAdminSubModulesWrapper() {
   const { data: session, status } = useSession();
   const [searchInput, setSearchInput] = useState<string>("");
 
+  const [isSelectedDeleteSubModules, setIsSelectedDeleteSubModules] =
+    useState<SubModules | null>(null);
+  const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
+
+  const deleteSubModuleHandler = (data: SubModules) => {
+    setIsSelectedDeleteSubModules(data);
+    setIsDialogDeleteOpen(true);
+  };
+
+  const queryClient = useQueryClient();
+
   const { data, isPending } = useGetAllSubModules(
     session?.access_token as string,
     {
       enabled: status === "authenticated",
-    }
+    },
   );
 
   const filteredData = (data?.data ?? []).filter((item: SubModules) =>
-    item.title.toLowerCase().includes(searchInput.toLowerCase())
+    item.title.toLowerCase().includes(searchInput.toLowerCase()),
   );
+
+  const { mutate: deleteSubModule } = useDeleteSubModule({
+    onError: (error) => {
+      toast.error("Gagal menghapus sub modul!", {
+        description: error.response?.data.meta.message ?? "Terjadi kesalahan.",
+      });
+    },
+    onSuccess: () => {
+      setIsSelectedDeleteSubModules(null);
+      toast.success("Berhasil menghapus sub modul!");
+      queryClient.invalidateQueries({
+        queryKey: ["get-all-sub-modules"],
+      });
+    },
+  });
+
+  const handleDeleteModule = () => {
+    if (isSelectedDeleteSubModules) {
+      deleteSubModule({
+        id: isSelectedDeleteSubModules.id,
+        token: session?.access_token as string,
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -43,11 +82,20 @@ export default function DashboardAdminSubModulesWrapper() {
           </Link>
         </Button>
       </div>
+
       <DataTable
         data={filteredData}
         isLoading={isPending}
-        columns={subModulesColumns}
+        columns={subModulesColumns({ deleteSubModuleHandler })}
       />
+
+      {isSelectedDeleteSubModules && (
+        <AlertDialogDeleteSubModule
+          open={isDialogDeleteOpen}
+          setOpen={setIsDialogDeleteOpen}
+          confirmDelete={handleDeleteModule}
+        />
+      )}
     </div>
   );
 }
