@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import HomeWrapper from "@/components/organisms/home/HomeWrapper";
 
-export default function Home() {
-  return redirect("/login");
+export default function HomePage() {
+  return <HomeWrapper />;
 }

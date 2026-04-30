@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Rubik } from "next/font/google";
+import { Bricolage_Grotesque, Rubik } from "next/font/google";
 import "./globals.css";
 import GlobalProvider from "@/components/organisms/GlobalProvider";
 import { getMetadata } from "@/lib/metadata";
 
 const rubik = Rubik({
   variable: "--font-rubik",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
@@ -39,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${rubik.variable} antialiased`}>
+      <body className={`${rubik.variable} ${bricolage.variable} antialiased`}>
         <GlobalProvider>{children}</GlobalProvider>
       </body>
     </html>
