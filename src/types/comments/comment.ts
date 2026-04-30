@@ -1,3 +1,4 @@
+import { MaterialContent } from "../material-contents/material-content";
 import { User } from "../user/user";
 
 export interface Comment {
@@ -10,4 +11,5 @@ export interface Comment {
   replies?: Comment[];
   created_at: Date;
   updated_at: Date;
+  material_content?: MaterialContent;
 }
