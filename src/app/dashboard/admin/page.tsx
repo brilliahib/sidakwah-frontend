@@ -1,4 +1,5 @@
 import DashboardTitle from "@/components/atoms/typography/DashboardTitle";
+import DashboardAdminWrapper from "@/components/organisms/dashboard/admin/DashboardAdminWrapper";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardAdminPage() {
-  return <DashboardTitle title="Dashboard Admin" />;
+  return (
+    <main>
+      <DashboardTitle title="Dashboard Admin" />
+      <DashboardAdminWrapper />
+    </main>
+  );
 }
