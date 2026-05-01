@@ -104,7 +104,7 @@ export default function HomeFeature() {
   const activePreview = featurePreviews[activeIndex];
 
   return (
-    <section className="w-full bg-white py-20 md:py-28">
+    <section className="w-full bg-white py-20 md:py-28" id="features">
       <div>
         <div className="mx-auto pad-x-3xl flex flex-col items-center text-center">
           <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
