@@ -137,6 +137,10 @@ body {
   .pad-x-xl {
     @apply px-4 md:px-[6%] lg:px-[10%] xl:px-[12%];
   }
+
+  .pad-x-3xl {
+    @apply px-4 md:px-[1%] lg:px-[4%] xl:px-[6%];
+  }
 }
 
 @layer utilities {

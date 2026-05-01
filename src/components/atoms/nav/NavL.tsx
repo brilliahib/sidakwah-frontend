@@ -11,8 +11,8 @@ export default function NavL() {
               <Image
                 src={"/images/logo.png"}
                 alt="Nusa Dakwah"
-                width={150}
-                height={150}
+                width={100}
+                height={100}
               />
             </div>
           </Link>
