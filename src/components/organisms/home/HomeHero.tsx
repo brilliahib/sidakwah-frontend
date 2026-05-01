@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import Image from "next/image";
 import Navbar from "../nav/Navbar";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default function HomeHero() {
   return (
@@ -41,9 +42,14 @@ export default function HomeHero() {
               placeholder="Cari modul..."
               className="flex-1 bg-transparent px-5 py-3 outline-none text-gray-700 placeholder:text-gray-400 md:text-base text-sm"
             />
-            <Button className="shrink-0 rounded-full bg-emerald-700 md:px-8! py-2 md:h-12 text-white font-semibold hover:bg-emerald-800 transition">
-              <Search className="w-5 h-5" />
-              <span className="md:flex hidden">Cari Modul</span>
+            <Button
+              className="shrink-0 rounded-full bg-emerald-700 md:px-8! py-2 md:h-12 text-white font-semibold hover:bg-emerald-800 transition"
+              asChild
+            >
+              <Link href={"/dashboard"}>
+                <Search className="w-5 h-5" />
+                <span className="md:flex hidden">Cari Modul</span>
+              </Link>
             </Button>
           </div>
         </div>
