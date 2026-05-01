@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Navbar from "../nav/Navbar";
+import { Badge } from "@/components/ui/badge";
 
 export default function HomeHero() {
   return (
@@ -18,6 +19,12 @@ export default function HomeHero() {
 
       <div className="relative z-10 flex flex-col items-center justify-center mt-14 md:mt-24 px-8 lg:px-12 py-12 md:py-24 font-bricolage">
         <div className="text-center space-y-6">
+          <Badge
+            variant={"outline"}
+            className="text-sm! md:text-base bg-white/20 text-white px-4 py-2 rounded-full border-0"
+          >
+            No.1 Dakwah Digital di Indonesia
+          </Badge>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4">
             Dakwah Melalui <br /> Teknologi
           </h1>

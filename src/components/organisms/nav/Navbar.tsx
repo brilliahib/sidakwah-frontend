@@ -30,9 +30,9 @@ export default function Navbar() {
         active: pathname.startsWith("#tentang"),
       },
       {
-        href: "#modul",
-        label: "Modul",
-        active: pathname.startsWith("#modul"),
+        href: "#features",
+        label: "Fitur",
+        active: pathname.startsWith("#features"),
       },
       {
         href: "#keunggulan",
