@@ -28,15 +28,15 @@ export default function HomeHero() {
         </div>
 
         <div className="w-full max-w-xl">
-          <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden px-3 py-2">
+          <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden px-3 md:py-2">
             <input
               type="text"
               placeholder="Cari modul..."
-              className="flex-1 bg-transparent px-5 py-3 outline-none text-gray-700 placeholder:text-gray-400"
+              className="flex-1 bg-transparent px-5 py-3 outline-none text-gray-700 placeholder:text-gray-400 md:text-base text-sm"
             />
-            <Button className="shrink-0 rounded-full bg-emerald-700 px-8! py-2 h-12 text-white font-semibold hover:bg-emerald-800 transition">
+            <Button className="shrink-0 rounded-full bg-emerald-700 md:px-8! py-2 md:h-12 text-white font-semibold hover:bg-emerald-800 transition">
               <Search className="w-5 h-5" />
-              Cari Modul
+              <span className="md:flex hidden">Cari Modul</span>
             </Button>
           </div>
         </div>

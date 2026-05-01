@@ -101,6 +101,11 @@ export default function NavButton() {
               </MobileLink>
             </nav>
             <SheetFooter>
+              <Button variant={"outline"} className="rounded-full" asChild>
+                <Link href="/login" className="font-semibold">
+                  Masuk
+                </Link>
+              </Button>
               <Button className="rounded-full" asChild>
                 <Link href="/register" className="font-semibold">
                   Daftar
