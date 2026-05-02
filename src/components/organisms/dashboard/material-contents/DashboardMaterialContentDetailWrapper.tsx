@@ -8,6 +8,7 @@ import { useGetAllComment } from "@/http/comments/get-all-comment";
 import { useGetDetailMaterialContent } from "@/http/material-contents/get-detail-material-content";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface DashboardMaterialContentDetailWrapperProps {
   contentId: number;
@@ -35,7 +36,7 @@ export default function DashboardMaterialContentDetailWrapper({
   );
 
   const articleImage = data?.data.article_images
-    ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/${data.data.article_images}`
+    ? getImagePreviewUrl(data.data.article_images)
     : null;
 
   return (
@@ -75,7 +76,7 @@ export default function DashboardMaterialContentDetailWrapper({
                 {articleImage && (
                   <div className="overflow-hidden rounded-lg border">
                     <Image
-                      src={articleImage}
+                      src={getImagePreviewUrl(articleImage) as string}
                       alt={data.data.article_title ?? "Gambar artikel"}
                       width={1200}
                       height={800}

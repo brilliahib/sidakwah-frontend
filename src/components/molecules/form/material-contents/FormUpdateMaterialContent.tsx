@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { Check, ChevronsUpDown, CloudUpload, Trash2 } from "lucide-react";
 import { MaterialContent } from "@/types/material-contents/material-content";
 import { getErrorMessage } from "@/utils/error-response";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface FormUpdateMaterialContentProps {
   data?: MaterialContent;
@@ -125,7 +126,7 @@ export default function FormUpdateMaterialContent({
     setIsArticleActive(hasArticle);
 
     if (data.article_images) {
-      setImageUrlPreview(data.article_images);
+      setImageUrlPreview(getImagePreviewUrl(data.article_images));
     } else {
       setImageUrlPreview(null);
     }
