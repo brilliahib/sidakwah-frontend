@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function DashboardSettingWrapper() {
   return (
-    <section>
+    <section className="space-y-6">
       <FormUpdateProfilePicture />
       <Tabs defaultValue="account" className="w-full">
         <TabsList>

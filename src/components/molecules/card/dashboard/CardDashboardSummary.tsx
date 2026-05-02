@@ -89,7 +89,7 @@ export default function CardDashboardSummary({
             </CardHeader>
 
             <CardContent>
-              <p className="text-xl md:text-2xl xl:text-3xl font-bold">
+              <p className="text-2xl xl:text-3xl font-bold">
                 {data?.[item.key] ?? 0}
               </p>
             </CardContent>

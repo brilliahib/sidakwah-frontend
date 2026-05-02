@@ -32,6 +32,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useCreateComment } from "@/http/comments/create-comment";
 import { useQueryClient } from "@tanstack/react-query";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface CardListCommentProps {
   data?: Comment[];
@@ -222,7 +223,9 @@ export default function CardListComment({
       <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
         <div className={`flex gap-3 group ${getDepthStyles()}`}>
           <Avatar className="w-10 h-10 flex-shrink-0">
-            <AvatarImage src={comment.user.profile_picture || undefined} />
+            <AvatarImage
+              src={getImagePreviewUrl(comment.user.profile_picture) || ""}
+            />
             <AvatarFallback>{getInitials(comment.user.name)}</AvatarFallback>
           </Avatar>
 

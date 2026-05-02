@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Session } from "next-auth";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface CardListCommentProps {
   data?: Comment[];
@@ -51,7 +52,9 @@ function CommentCard({
         <CardContent>
           <div className="flex gap-3 mb-3">
             <Avatar className="w-10 h-10 flex-shrink-0">
-              <AvatarImage src={comment.user?.profile_picture || undefined} />
+              <AvatarImage
+                src={getImagePreviewUrl(comment.user?.profile_picture) || ""}
+              />
               <AvatarFallback>
                 {comment.user?.name ? getInitials(comment.user.name) : "U"}
               </AvatarFallback>
