@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import { useChangeProfilePicture } from "@/http/auth/update-profile-picture";
 import { getErrorMessage } from "@/utils/error-response";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FormUpdateProfilePicture() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const isLoading = !session && status === "loading";
   const queryClient = useQueryClient();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -92,16 +94,25 @@ export default function FormUpdateProfilePicture() {
       <div {...getRootProps()} className="relative cursor-pointer">
         <input {...getInputProps()} />
 
-        <Avatar className="h-42 w-42 border-4 border-background shadow-md">
-          <AvatarImage
-            src={preview ?? ""}
-            alt="Preview foto profil"
-            className="object-cover"
-          />
-          <AvatarFallback className="text-3xl font-semibold">
-            {fallbackName}
-          </AvatarFallback>
-        </Avatar>
+        {isLoading ? (
+          <div className="relative">
+            <Skeleton className="h-42 w-42 rounded-full" />
+
+            <div className="absolute right-4 bottom-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </div>
+          </div>
+        ) : (
+          <Avatar className="h-42 w-42 rounded-full border">
+            {preview ? (
+              <AvatarImage src={preview} alt="Preview Foto Profil" />
+            ) : (
+              <AvatarFallback className="rounded-full">
+                <span className="text-4xl font-bold">{fallbackName}</span>
+              </AvatarFallback>
+            )}
+          </Avatar>
+        )}
 
         <div className="absolute right-4 bottom-2 rounded-full bg-primary p-2 text-primary-foreground shadow-md">
           <UserRoundPen className="h-4 w-4" />

@@ -28,6 +28,7 @@ import { Session } from "next-auth";
 import { generateFallbackFromName } from "@/utils/generate-name";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface SidebarUserProps {
   session: Session;
@@ -47,7 +48,7 @@ export function SidebarUser({ session }: SidebarUserProps) {
             >
               <Avatar className="h-8 w-8 rounded-full border">
                 <AvatarImage
-                  src={session.user.profile_picture || ""}
+                  src={getImagePreviewUrl(session.user.profile_picture) || ""}
                   alt={session.user.name || "Tidak dapat dimuat"}
                 />
                 <AvatarFallback className="rounded-lg">
@@ -73,7 +74,7 @@ export function SidebarUser({ session }: SidebarUserProps) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-full border">
                   <AvatarImage
-                    src={session.user.profile_picture || ""}
+                    src={getImagePreviewUrl(session.user.profile_picture) || ""}
                     alt={session.user.name || "Tidak dapat dimuat"}
                   />
                   <AvatarFallback className="rounded-lg">
