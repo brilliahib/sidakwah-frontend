@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { User } from "@/types/user/user";
 import { generateFallbackFromName } from "@/utils/generate-name";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface CardUserDetailProps {
   data?: User;
@@ -14,7 +15,7 @@ export default function CardUserDetail({ data }: CardUserDetailProps) {
         <div className="flex justify-center items-center mb-12">
           <Avatar className="h-36 w-36 rounded-full border">
             <AvatarImage
-              src={data?.profile_picture || ""}
+              src={getImagePreviewUrl(data?.profile_picture) || ""}
               alt={data?.name || "Tidak dapat dimuat"}
               className="h-36 w-36 rounded-full"
             />

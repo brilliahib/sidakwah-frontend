@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import {
   MessageSquare,
-  ThumbsUp,
   MoreVertical,
   Reply,
   Send,
@@ -33,6 +32,13 @@ import { toast } from "sonner";
 import { useCreateComment } from "@/http/comments/create-comment";
 import { useQueryClient } from "@tanstack/react-query";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+
+// Style LTR konsisten untuk semua textarea & wrapper
+const LTR_STYLE: React.CSSProperties = {
+  direction: "ltr",
+  unicodeBidi: "isolate",
+  textAlign: "left",
+};
 
 interface CardListCommentProps {
   data?: Comment[];
@@ -100,7 +106,6 @@ export default function CardListComment({
     setReplyingTo(null);
   };
 
-  // Main comment form
   const mainCommentForm = useForm<CommentType>({
     resolver: zodResolver(commentSchema),
     defaultValues: {
@@ -110,7 +115,6 @@ export default function CardListComment({
     },
   });
 
-  // Reply form
   const replyForm = useForm<CommentType>({
     resolver: zodResolver(commentSchema),
     defaultValues: {
@@ -172,7 +176,6 @@ export default function CardListComment({
     );
   };
 
-  // Skeleton Loading Component
   const CommentSkeleton = ({ depth = 0 }: { depth?: number }) => (
     <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
       <div className="flex gap-3">
@@ -209,7 +212,6 @@ export default function CardListComment({
       replyForm.setValue("parent_id", comment.id);
     };
 
-    // Color variations based on depth
     const getDepthStyles = () => {
       if (depth === 0) return "border-l-0";
       return `border-l-2 pl-4`;
@@ -251,11 +253,6 @@ export default function CardListComment({
             </p>
 
             <div className="flex items-center gap-1 flex-wrap">
-              <Button variant="ghost" size="sm">
-                <ThumbsUp className="w-4 h-4 mr-1" />
-                <span className="text-xs font-medium">Suka</span>
-              </Button>
-
               <Button variant="ghost" size="sm" onClick={startReply}>
                 <Reply className="w-4 h-4 mr-1" />
                 <span className="text-xs font-medium">Balas</span>
@@ -289,7 +286,11 @@ export default function CardListComment({
             </div>
 
             {isCurrentlyReplying && (
-              <div className="mt-4 bg-background rounded-lg p-4 border">
+              <div
+                className="mt-4 bg-background rounded-lg p-4 border"
+                dir="ltr"
+                style={LTR_STYLE}
+              >
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8 flex-shrink-0">
                     <AvatarImage
@@ -301,11 +302,13 @@ export default function CardListComment({
                         : "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
+                  <div className="flex-1" dir="ltr" style={LTR_STYLE}>
                     <Form {...replyForm}>
                       <form
                         onSubmit={replyForm.handleSubmit(onSubmitReply)}
                         className="space-y-3"
+                        dir="ltr"
+                        style={LTR_STYLE}
                       >
                         <FormField
                           control={replyForm.control}
@@ -319,13 +322,11 @@ export default function CardListComment({
                                   onBlur={field.onBlur}
                                   name={field.name}
                                   placeholder={`Balas ke ${comment.user.name}...`}
-                                  className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm"
+                                  className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm text-left"
                                   autoFocus
                                   disabled={isCreatingReply}
-                                  style={{
-                                    direction: "ltr",
-                                    unicodeBidi: "plaintext",
-                                  }}
+                                  dir="ltr"
+                                  style={LTR_STYLE}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -388,7 +389,8 @@ export default function CardListComment({
   };
 
   return (
-    <div className="space-y-6 mt-6">
+    // Paksa seluruh component LTR dari root agar tidak dipengaruhi RTL dari parent manapun
+    <div className="space-y-6 mt-6" dir="ltr" style={LTR_STYLE}>
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b-2 border-gray-200 dark:border-gray-700">
         <div className="p-2 rounded-lg bg-primary">
@@ -421,6 +423,8 @@ export default function CardListComment({
             <form
               onSubmit={mainCommentForm.handleSubmit(onSubmitMainComment)}
               className="space-y-4"
+              dir="ltr"
+              style={LTR_STYLE}
             >
               <FormField
                 control={mainCommentForm.control}
@@ -436,7 +440,8 @@ export default function CardListComment({
                         placeholder="Tulis komentar Anda di sini..."
                         className="min-h-[120px] text-sm resize-none bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 shadow-sm rounded-xl"
                         disabled={isCreatingComment}
-                        style={{ direction: "ltr", unicodeBidi: "plaintext" }}
+                        dir="ltr"
+                        style={LTR_STYLE}
                       />
                     </FormControl>
                     <FormMessage />

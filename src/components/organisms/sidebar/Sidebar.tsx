@@ -20,15 +20,10 @@ import {
   LayoutDashboard,
   Settings2,
   Users,
-  TriangleAlert,
-  Rss,
-  CalendarFold,
-  Speech,
   Book,
   FileText,
   File,
   MessageCircleMore,
-  Info,
 } from "lucide-react";
 import { SidebarUser } from "./SidebarUser";
 
@@ -127,7 +122,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                         <SidebarMenuButton
                           asChild
                           className={buttonClass(
-                            "/dashboard/admin/sub-modules"
+                            "/dashboard/admin/sub-modules",
                           )}
                         >
                           <Link href="/dashboard/admin/sub-modules">
@@ -140,7 +135,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                         <SidebarMenuButton
                           asChild
                           className={buttonClass(
-                            "/dashboard/admin/material-contents"
+                            "/dashboard/admin/material-contents",
                           )}
                         >
                           <Link href="/dashboard/admin/material-contents">
@@ -153,7 +148,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                         <SidebarMenuButton
                           asChild
                           className={buttonClass(
-                            "/dashboard/admin/discussions"
+                            "/dashboard/admin/discussions",
                           )}
                         >
                           <Link href="/dashboard/admin/discussions">
@@ -233,21 +228,6 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                   <Link href="/dashboard/settings">
                     <Settings2 />
                     <span>Pengaturan</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className={`hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-900 ${
-                    pathname === "/dashboard/help"
-                      ? "bg-primary/10 text-primary dark:bg-slate-800"
-                      : ""
-                  }`}
-                >
-                  <Link href="/dashboard/help">
-                    <Info />
-                    <span>Pusat Bantuan</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
