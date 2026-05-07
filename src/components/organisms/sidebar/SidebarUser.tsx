@@ -101,12 +101,6 @@ export function SidebarUser({ session }: SidebarUserProps) {
               </Link>
               <Link href={"/dashboard/settings"}>
                 <DropdownMenuItem className="cursor-pointer">
-                  <CircleUser />
-                  Account
-                </DropdownMenuItem>
-              </Link>
-              <Link href={"/dashboard/settings"}>
-                <DropdownMenuItem className="cursor-pointer">
                   <Settings />
                   Pengaturan
                 </DropdownMenuItem>

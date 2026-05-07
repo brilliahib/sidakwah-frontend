@@ -5,15 +5,12 @@ import AlertDialogResetPassword from "@/components/atoms/alert-dialog/users/Aler
 import { userColumns } from "@/components/atoms/datacolumn/DataUser";
 import SearchBar from "@/components/atoms/search/Searchbar";
 import { DataTable } from "@/components/molecules/datatable/DataTable";
-import { Button } from "@/components/ui/button";
 import { useDeleteuser } from "@/http/users/delete-user";
 import { useGetAllUser } from "@/http/users/get-all-user";
 import { useResetPassword } from "@/http/users/reset-password-user";
 import { User } from "@/types/user/user";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -27,7 +24,7 @@ export default function DashboardUserWrapper() {
     useState<User | null>(null);
 
   const [isSelectedDeleteUser, setIsSelectedDeleteUser] = useState<User | null>(
-    null
+    null,
   );
 
   const [isDialogResetPasswordOpen, setIsDialogResetPasswordOpen] =
@@ -50,7 +47,7 @@ export default function DashboardUserWrapper() {
   });
 
   const filteredData = (data?.data ?? []).filter((item: User) =>
-    item.name.toLowerCase().includes(searchInput.toLowerCase())
+    item.name.toLowerCase().includes(searchInput.toLowerCase()),
   );
 
   const { mutate: resetPassword } = useResetPassword({
@@ -100,14 +97,6 @@ export default function DashboardUserWrapper() {
           value={searchInput}
           onChange={setSearchInput}
         />
-        <Button asChild>
-          <Link
-            href="/dashboard/admin/users/create"
-            className="flex items-center gap-2"
-          >
-            <Plus /> Tambah Pengguna
-          </Link>
-        </Button>
       </div>
       <DataTable
         columns={userColumns({

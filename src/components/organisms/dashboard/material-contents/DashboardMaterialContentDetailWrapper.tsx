@@ -86,7 +86,16 @@ export default function DashboardMaterialContentDetailWrapper({
                 )}
 
                 <div
-                  className="prose max-w-none"
+                  className="
+              prose prose-neutral max-w-none
+              prose-p:text-[1.0625rem] prose-p:leading-[1.85] prose-p:text-black/80
+              prose-a:text-black prose-a:underline prose-a:underline-offset-2
+              prose-strong:text-black prose-strong:font-semibold
+              prose-em:italic
+              prose-blockquote:border-l prose-blockquote:border-black/[0.1] prose-blockquote:bg-black/[0.02] prose-blockquote:pl-4 prose-blockquote:italic
+              prose-pre:bg-black/[0.04] prose-pre:border prose-pre:border-black/[0.08]
+              prose-pre:rounded-xl prose-pre:text-[12.5px] prose-pre:text-black
+            "
                   dangerouslySetInnerHTML={{
                     __html: data.data.article_content,
                   }}
