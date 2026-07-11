@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -35,12 +35,290 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
 import { useDeleteComment } from "@/http/comments/delete-comment";
 
-
 interface CardListCommentProps {
   data?: Comment[];
   materialContentId: number;
   isLoading?: boolean;
 }
+
+const formatTimeAgo = (date: Date) => {
+  const now = new Date();
+  const commentDate = new Date(date);
+  const diffInSeconds = Math.floor(
+    (now.getTime() - commentDate.getTime()) / 1000,
+  );
+
+  if (diffInSeconds < 60) return "baru saja";
+  if (diffInSeconds < 3600)
+    return `${Math.floor(diffInSeconds / 60)} menit yang lalu`;
+  if (diffInSeconds < 86400)
+    return `${Math.floor(diffInSeconds / 3600)} jam yang lalu`;
+  if (diffInSeconds < 604800)
+    return `${Math.floor(diffInSeconds / 86400)} hari yang lalu`;
+  return commentDate.toLocaleDateString("id-ID");
+};
+
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
+const countTotalReplies = (comment: Comment): number => {
+  if (!comment.replies || comment.replies.length === 0) return 0;
+  return comment.replies.reduce(
+    (total, reply) => total + 1 + countTotalReplies(reply),
+    0,
+  );
+};
+
+const CommentSkeleton = ({ depth = 0 }: { depth?: number }) => (
+  <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
+    <div className="flex gap-3">
+      <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+      <div className="flex-1 space-y-3">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+        <Skeleton className="h-16 w-full" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-20" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+interface CommentItemProps {
+  comment: Comment;
+  depth?: number;
+  expandedComments: Set<number>;
+  toggleExpand: (id: number) => void;
+  replyingTo: number | null;
+  handleReply: (id: number) => void;
+  handleCancelReply: () => void;
+  replyForm: UseFormReturn<CommentType>;
+  onSubmitReply: (values: CommentType) => void;
+  isCreatingReply: boolean;
+  session: any;
+  deleteComment: any;
+  isDeleting: boolean;
+}
+
+const CommentItem = ({
+  comment,
+  depth = 0,
+  expandedComments,
+  toggleExpand,
+  replyingTo,
+  handleReply,
+  handleCancelReply,
+  replyForm,
+  onSubmitReply,
+  isCreatingReply,
+  session,
+  deleteComment,
+  isDeleting,
+}: CommentItemProps) => {
+  const hasReplies = comment.replies && comment.replies.length > 0;
+  const isExpanded = expandedComments.has(comment.id);
+  const isCurrentlyReplying = replyingTo === comment.id;
+  const totalReplies = countTotalReplies(comment);
+
+  const startReply = () => {
+    handleReply(comment.id);
+    replyForm.setValue("parent_id", comment.id);
+  };
+
+  const getDepthStyles = () => {
+    if (depth === 0) return "border-l-0";
+    return `border-l-2 pl-4`;
+  };
+
+  const isOwner =
+    session?.user?.id !== undefined &&
+    String(session.user.id) === String(comment.user.id);
+
+  return (
+    <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
+      <div className={`flex gap-3 group ${getDepthStyles()}`}>
+        <Avatar className="w-10 h-10 flex-shrink-0">
+          <AvatarImage
+            src={getImagePreviewUrl(comment.user.profile_picture) || ""}
+          />
+          <AvatarFallback>{getInitials(comment.user.name)}</AvatarFallback>
+        </Avatar>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              {comment.user.name}
+            </span>
+
+            {isOwner && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                Anda
+              </span>
+            )}
+
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {formatTimeAgo(comment.created_at)}
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed mb-3 whitespace-pre-wrap">
+            {comment.content}
+          </p>
+
+          <div className="flex items-center gap-1 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={startReply}>
+              <Reply className="w-4 h-4 mr-1" />
+              <span className="text-xs font-medium">Balas</span>
+            </Button>
+
+            {hasReplies && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleExpand(comment.id)}
+              >
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4 mr-1" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 mr-1" />
+                )}
+                <span className="text-xs font-medium">
+                  {isExpanded ? "Sembunyikan" : "Tampilkan"} {totalReplies}{" "}
+                  balasan
+                </span>
+              </Button>
+            )}
+
+            {session?.user?.role === "admin" && depth === 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => deleteComment({ id: comment.id })}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </Button>
+            )}
+          </div>
+
+          {isCurrentlyReplying && (
+            <div className="mt-4 bg-background rounded-lg p-4 border">
+              <div className="flex gap-3">
+                <Avatar className="w-8 h-8 flex-shrink-0">
+                  <AvatarImage
+                    src={session?.user?.profile_picture || undefined}
+                  />
+                  <AvatarFallback>
+                    {session?.user?.name ? getInitials(session.user.name) : "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <Form {...replyForm}>
+                    <form
+                      onSubmit={replyForm.handleSubmit(onSubmitReply)}
+                      className="space-y-3"
+                    >
+                      <FormField
+                        control={replyForm.control}
+                        name="content"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Textarea
+                                value={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                name={field.name}
+                                placeholder={`Balas ke ${comment.user.name}...`}
+                                className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm text-left"
+                                autoFocus
+                                disabled={isCreatingReply}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          disabled={
+                            isCreatingReply ||
+                            !replyForm.watch("content").trim()
+                          }
+                        >
+                          {isCreatingReply ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Mengirim...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Balas
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelReply}
+                          disabled={isCreatingReply}
+                        >
+                          Batal
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {hasReplies && isExpanded && (
+            <div className="mt-4 space-y-4">
+              {comment.replies?.map((reply) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  depth={depth + 1}
+                  expandedComments={expandedComments}
+                  toggleExpand={toggleExpand}
+                  replyingTo={replyingTo}
+                  handleReply={handleReply}
+                  handleCancelReply={handleCancelReply}
+                  replyForm={replyForm}
+                  onSubmitReply={onSubmitReply}
+                  isCreatingReply={isCreatingReply}
+                  session={session}
+                  deleteComment={deleteComment}
+                  isDeleting={isDeleting}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function CardListComment({
   data,
@@ -57,32 +335,6 @@ export default function CardListComment({
 
   const parentComments =
     data?.filter((comment) => comment.parent_id === null) || [];
-
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const commentDate = new Date(date);
-    const diffInSeconds = Math.floor(
-      (now.getTime() - commentDate.getTime()) / 1000,
-    );
-
-    if (diffInSeconds < 60) return "baru saja";
-    if (diffInSeconds < 3600)
-      return `${Math.floor(diffInSeconds / 60)} menit yang lalu`;
-    if (diffInSeconds < 86400)
-      return `${Math.floor(diffInSeconds / 3600)} jam yang lalu`;
-    if (diffInSeconds < 604800)
-      return `${Math.floor(diffInSeconds / 86400)} hari yang lalu`;
-    return commentDate.toLocaleDateString("id-ID");
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const toggleExpand = (commentId: number) => {
     const newExpanded = new Set(expandedComments);
@@ -174,224 +426,6 @@ export default function CardListComment({
       material_content_id: Number(materialContentId),
       parent_id: Number(replyingTo),
     });
-  };
-
-  const countTotalReplies = (comment: Comment): number => {
-    if (!comment.replies || comment.replies.length === 0) return 0;
-    return comment.replies.reduce(
-      (total, reply) => total + 1 + countTotalReplies(reply),
-      0,
-    );
-  };
-
-  const CommentSkeleton = ({ depth = 0 }: { depth?: number }) => (
-    <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
-      <div className="flex gap-3">
-        <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-          <Skeleton className="h-16 w-full" />
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const CommentItem = ({
-    comment,
-    depth = 0,
-  }: {
-    comment: Comment;
-    depth?: number;
-  }) => {
-    const hasReplies = comment.replies && comment.replies.length > 0;
-    const isExpanded = expandedComments.has(comment.id);
-    const isCurrentlyReplying = replyingTo === comment.id;
-    const totalReplies = countTotalReplies(comment);
-
-    const startReply = () => {
-      handleReply(comment.id);
-      replyForm.setValue("parent_id", comment.id);
-    };
-
-    const getDepthStyles = () => {
-      if (depth === 0) return "border-l-0";
-      return `border-l-2 pl-4`;
-    };
-
-    const isOwner =
-      session?.user?.id !== undefined &&
-      String(session.user.id) === String(comment.user.id);
-
-    return (
-      <div className={`${depth > 0 ? "ml-8 mt-4" : ""}`}>
-        <div className={`flex gap-3 group ${getDepthStyles()}`}>
-          <Avatar className="w-10 h-10 flex-shrink-0">
-            <AvatarImage
-              src={getImagePreviewUrl(comment.user.profile_picture) || ""}
-            />
-            <AvatarFallback>{getInitials(comment.user.name)}</AvatarFallback>
-          </Avatar>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
-                {comment.user.name}
-              </span>
-
-              {isOwner && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
-                  Anda
-                </span>
-              )}
-
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {formatTimeAgo(comment.created_at)}
-              </span>
-            </div>
-
-            <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed mb-3 whitespace-pre-wrap">
-              {comment.content}
-            </p>
-
-            <div className="flex items-center gap-1 flex-wrap">
-              <Button variant="ghost" size="sm" onClick={startReply}>
-                <Reply className="w-4 h-4 mr-1" />
-                <span className="text-xs font-medium">Balas</span>
-              </Button>
-
-              {hasReplies && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleExpand(comment.id)}
-                >
-                  {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                  )}
-                  <span className="text-xs font-medium">
-                    {isExpanded ? "Sembunyikan" : "Tampilkan"} {totalReplies}{" "}
-                    balasan
-                  </span>
-                </Button>
-              )}
-
-              {session?.user?.role === "admin" && depth === 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => deleteComment({ id: comment.id })}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                </Button>
-              )}
-            </div>
-
-            {isCurrentlyReplying && (
-              <div
-                className="mt-4 bg-background rounded-lg p-4 border"
-              >
-                <div className="flex gap-3">
-                  <Avatar className="w-8 h-8 flex-shrink-0">
-                    <AvatarImage
-                      src={session?.user?.profile_picture || undefined}
-                    />
-                    <AvatarFallback>
-                      {session?.user?.name
-                        ? getInitials(session.user.name)
-                        : "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <Form {...replyForm}>
-                      <form
-                        onSubmit={replyForm.handleSubmit(onSubmitReply)}
-                        className="space-y-3"
-                      >
-                        <FormField
-                          control={replyForm.control}
-                          name="content"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Textarea
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  onBlur={field.onBlur}
-                                  name={field.name}
-                                  placeholder={`Balas ke ${comment.user.name}...`}
-                                  className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm text-left"
-                                  autoFocus
-                                  disabled={isCreatingReply}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            type="submit"
-                            size="sm"
-                            disabled={
-                              isCreatingReply ||
-                              !replyForm.watch("content").trim()
-                            }
-                          >
-                            {isCreatingReply ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Mengirim...
-                              </>
-                            ) : (
-                              <>
-                                <Send className="w-4 h-4 mr-2" />
-                                Balas
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={handleCancelReply}
-                            disabled={isCreatingReply}
-                          >
-                            Batal
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {hasReplies && isExpanded && (
-              <div className="mt-4 space-y-4">
-                {comment.replies?.map((reply) => (
-                  <CommentItem
-                    key={reply.id}
-                    comment={reply}
-                    depth={depth + 1}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -502,7 +536,20 @@ export default function CardListComment({
         <div className="space-y-6">
           {parentComments.map((comment, index) => (
             <div key={comment.id}>
-              <CommentItem comment={comment} />
+              <CommentItem
+                comment={comment}
+                expandedComments={expandedComments}
+                toggleExpand={toggleExpand}
+                replyingTo={replyingTo}
+                handleReply={handleReply}
+                handleCancelReply={handleCancelReply}
+                replyForm={replyForm}
+                onSubmitReply={onSubmitReply}
+                isCreatingReply={isCreatingReply}
+                session={session}
+                deleteComment={deleteComment}
+                isDeleting={isDeleting}
+              />
               {index < parentComments.length - 1 && (
                 <div className="border-b-2 border-gray-100 dark:border-gray-800 mt-6" />
               )}
