@@ -15,7 +15,7 @@ export const UpdateSubModuleHandler = async (
   body: SubModulesType,
   token: string,
 ): Promise<UpdateSubModuleResponse> => {
-  const { data } = await api.patch(`/sub-modules/${id}`, body, {
+  const { data } = await api.put(`/sub-modules/${id}`, body, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
