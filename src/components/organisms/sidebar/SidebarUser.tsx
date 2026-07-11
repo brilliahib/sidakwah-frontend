@@ -1,18 +1,14 @@
 "use client";
 
 import {
-  CircleUser,
   EllipsisVertical,
-  Home,
   LogOut,
-  Settings,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -26,7 +22,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Session } from "next-auth";
 import { generateFallbackFromName } from "@/utils/generate-name";
-import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
@@ -91,21 +86,6 @@ export function SidebarUser({ session }: SidebarUserProps) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <Link href={"/dashboard"}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Home />
-                  Dashboard
-                </DropdownMenuItem>
-              </Link>
-              <Link href={"/dashboard/settings"}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Settings />
-                  Pengaturan
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => signOut({ callbackUrl: "/" })}
