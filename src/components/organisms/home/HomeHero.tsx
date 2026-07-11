@@ -18,7 +18,7 @@ export default function HomeHero() {
 
       <div className="absolute inset-0 bg-black/20" />
 
-      <div className="relative z-10 flex flex-col items-center justify-center mt-14 md:mt-24 px-8 lg:px-12 py-12 md:py-24 font-bricolage">
+      <div className="relative z-10 flex flex-col items-center justify-center mt-14 md:mt-24 px-8 md:px-12 py-12 md:py-24 font-bricolage">
         <div className="text-center space-y-6">
           <Badge
             variant={"outline"}
@@ -26,10 +26,10 @@ export default function HomeHero() {
           >
             No.1 Dakwah Digital di Indonesia
           </Badge>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4">
+          <h1 className="text-5xl md:text-6xl md:text-7xl font-bold text-white leading-tight mb-4">
             Dakwah Melalui <br /> Teknologi
           </h1>
-          <p className="text-sm lg:text-lg text-gray-200 max-w-full mx-auto mb-8">
+          <p className="text-sm md:text-lg text-gray-200 max-w-full mx-auto mb-8">
             Menjalankan dakwah dengan teknologi untuk menjangkau lebih banyak
             jiwa!
           </p>

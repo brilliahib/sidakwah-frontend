@@ -4,12 +4,12 @@ import Link from "next/link";
 
 export default function AuthLoginWrapper() {
   return (
-    <div className="relative min-h-screen flex-col md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="relative min-h-screen flex-col md:grid md:max-w-none md:grid-cols-2 md:px-0">
       <div
         className="
           bg-muted relative flex flex-col text-white
           h-[250px] p-6
-          lg:h-full lg:p-10
+          md:h-full md:p-10
           dark:border-r
         "
       >
@@ -26,7 +26,7 @@ export default function AuthLoginWrapper() {
             />
           </Link>
         </div>
-        <div className="relative z-20 mt-auto hidden lg:block">
+        <div className="relative z-20 mt-auto hidden md:block">
           <blockquote className="space-y-2">
             <p className="max-w-md text-lg">
               &ldquo;Menjalankan dakwah dengan teknologi untuk menjangkau lebih
@@ -35,7 +35,7 @@ export default function AuthLoginWrapper() {
           </blockquote>
         </div>
       </div>
-      <div className="flex flex-1 items-center p-4 lg:p-8">
+      <div className="flex flex-1 items-center p-4 md:p-8">
         <div className="mx-auto flex w-full flex-col justify-center gap-y-4 sm:w-[350px]">
           <FormAuthLogin />
         </div>

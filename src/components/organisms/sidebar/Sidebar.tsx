@@ -213,7 +213,7 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
         )}
 
         <SidebarGroup>
-          <SidebarGroupLabel>Pengaturan & Pusat Bantuan</SidebarGroupLabel>
+          <SidebarGroupLabel>Pengaturan</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>

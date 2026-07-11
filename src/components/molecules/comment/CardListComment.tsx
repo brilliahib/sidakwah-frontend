@@ -21,6 +21,7 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
+  Trash2,
 } from "lucide-react";
 import { Comment } from "@/types/comments/comment";
 import {
@@ -32,13 +33,8 @@ import { toast } from "sonner";
 import { useCreateComment } from "@/http/comments/create-comment";
 import { useQueryClient } from "@tanstack/react-query";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+import { useDeleteComment } from "@/http/comments/delete-comment";
 
-// Style LTR konsisten untuk semua textarea & wrapper
-const LTR_STYLE: React.CSSProperties = {
-  direction: "ltr",
-  unicodeBidi: "isolate",
-  textAlign: "left",
-};
 
 interface CardListCommentProps {
   data?: Comment[];
@@ -149,6 +145,18 @@ export default function CardListComment({
     },
     onError: (error) => {
       toast.error("Gagal menambahkan balasan");
+    },
+  });
+
+  const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment({
+    onSuccess: () => {
+      toast.success("Komentar berhasil dihapus!");
+      queryClient.invalidateQueries({
+        queryKey: ["get-all-comments", materialContentId],
+      });
+    },
+    onError: () => {
+      toast.error("Gagal menghapus komentar");
     },
   });
 
@@ -276,20 +284,22 @@ export default function CardListComment({
                 </Button>
               )}
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 px-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </Button>
+              {session?.user?.role === "admin" && depth === 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-950 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => deleteComment({ id: comment.id })}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                </Button>
+              )}
             </div>
 
             {isCurrentlyReplying && (
               <div
                 className="mt-4 bg-background rounded-lg p-4 border"
-                dir="ltr"
-                style={LTR_STYLE}
               >
                 <div className="flex gap-3">
                   <Avatar className="w-8 h-8 flex-shrink-0">
@@ -302,13 +312,11 @@ export default function CardListComment({
                         : "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1" dir="ltr" style={LTR_STYLE}>
+                  <div className="flex-1">
                     <Form {...replyForm}>
                       <form
                         onSubmit={replyForm.handleSubmit(onSubmitReply)}
                         className="space-y-3"
-                        dir="ltr"
-                        style={LTR_STYLE}
                       >
                         <FormField
                           control={replyForm.control}
@@ -325,8 +333,6 @@ export default function CardListComment({
                                   className="min-h-[100px] text-sm resize-none bg-white dark:bg-gray-950 shadow-sm text-left"
                                   autoFocus
                                   disabled={isCreatingReply}
-                                  dir="ltr"
-                                  style={LTR_STYLE}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -389,8 +395,7 @@ export default function CardListComment({
   };
 
   return (
-    // Paksa seluruh component LTR dari root agar tidak dipengaruhi RTL dari parent manapun
-    <div className="space-y-6 mt-6" dir="ltr" style={LTR_STYLE}>
+    <div className="space-y-6 mt-6">
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b-2 border-gray-200 dark:border-gray-700">
         <div className="p-2 rounded-lg bg-primary">
@@ -423,8 +428,6 @@ export default function CardListComment({
             <form
               onSubmit={mainCommentForm.handleSubmit(onSubmitMainComment)}
               className="space-y-4"
-              dir="ltr"
-              style={LTR_STYLE}
             >
               <FormField
                 control={mainCommentForm.control}
@@ -440,8 +443,6 @@ export default function CardListComment({
                         placeholder="Tulis komentar Anda di sini..."
                         className="min-h-[120px] text-sm resize-none bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 shadow-sm rounded-xl"
                         disabled={isCreatingComment}
-                        dir="ltr"
-                        style={LTR_STYLE}
                       />
                     </FormControl>
                     <FormMessage />

@@ -34,6 +34,8 @@ export const UpdateMaterialContentHandler = async (
       body.article_images,
       body.article_images.name,
     );
+  } else if (body.article_images === null) {
+    formData.append("article_images", "");
   }
 
   const { data } = await api.post(`/material-contents/${id}`, formData, {

@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MaterialContent } from "@/types/material-contents/material-content";
 import { Play } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface CardListMaterialContentProps {
   data: MaterialContent[];
@@ -26,6 +27,7 @@ export default function CardListMaterialContent({
   data,
   isPending,
 }: CardListMaterialContentProps) {
+  const pathname = usePathname();
   if (isPending) {
     return <CardListMaterialContentSkeleton />;
   }
@@ -39,7 +41,11 @@ export default function CardListMaterialContent({
       ) : (
         data?.map((materialContent) => (
           <Link
-            href={`contents/${materialContent.id}`}
+            href={
+              pathname.includes("/admin/")
+                ? `/dashboard/admin/material-contents/${materialContent.id}`
+                : `${pathname}/contents/${materialContent.id}`
+            }
             key={materialContent.id}
             className="group block"
           >

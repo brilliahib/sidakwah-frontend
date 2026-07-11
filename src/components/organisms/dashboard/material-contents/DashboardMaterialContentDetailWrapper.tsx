@@ -9,6 +9,12 @@ import { useGetDetailMaterialContent } from "@/http/material-contents/get-detail
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useDeleteMaterialContent } from "@/http/material-contents/delete-material-content";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface DashboardMaterialContentDetailWrapperProps {
   contentId: number;
@@ -18,6 +24,7 @@ export default function DashboardMaterialContentDetailWrapper({
   contentId,
 }: DashboardMaterialContentDetailWrapperProps) {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const { data, isPending } = useGetDetailMaterialContent(
     contentId,
@@ -39,9 +46,45 @@ export default function DashboardMaterialContentDetailWrapper({
     ? getImagePreviewUrl(data.data.article_images)
     : null;
 
+  const { mutate: deleteContent, isPending: isDeleting } =
+    useDeleteMaterialContent({
+      onSuccess: () => {
+        toast.success("Berhasil menghapus konten materi");
+        router.push("/dashboard/admin/material-contents");
+      },
+      onError: () => {
+        toast.error("Gagal menghapus konten materi");
+      },
+    });
+
   return (
     <div>
-      <DashboardTitle title={data?.data.title} isPending={isPending} />
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
+        <DashboardTitle title={data?.data.title} isPending={isPending} />
+        {session?.user?.role === "admin" && (
+          <div className="flex gap-2 shrink-0">
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/dashboard/admin/material-contents/${contentId}/edit`}>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Konten
+              </Link>
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                if (confirm("Apakah anda yakin ingin menghapus konten materi ini?")) {
+                  deleteContent({ id: contentId, token: session?.access_token as string });
+                }
+              }}
+              disabled={isDeleting}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Hapus Konten
+            </Button>
+          </div>
+        )}
+      </div>
       <div className="space-y-6">
         {isPending ? (
           <Skeleton className="aspect-video w-full rounded-lg" />
