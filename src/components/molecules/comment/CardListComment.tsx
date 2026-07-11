@@ -221,7 +221,9 @@ const CommentItem = ({
               <div className="flex gap-3">
                 <Avatar className="w-8 h-8 flex-shrink-0">
                   <AvatarImage
-                    src={session?.user?.profile_picture || undefined}
+                    src={
+                      getImagePreviewUrl(session?.user?.profile_picture) || ""
+                    }
                   />
                   <AvatarFallback>
                     {session?.user?.name ? getInitials(session.user.name) : "U"}
