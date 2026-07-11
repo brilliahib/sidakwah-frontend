@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Comment } from "@/types/comments/comment";
+import { getImagePreviewUrl } from "@/utils/get-image-preview";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import Image from "next/image";
@@ -28,13 +29,13 @@ export default function DialogDetailDiscussion({
         <DialogHeader>
           <DialogTitle>Detail Diskusi</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6 mt-4">
           <div className="flex items-start gap-4 p-4 border rounded-lg bg-muted/30">
             <div className="flex-shrink-0">
               {comment.user?.profile_picture ? (
                 <Image
-                  src={comment.user.profile_picture}
+                  src={getImagePreviewUrl(comment.user.profile_picture) || ""}
                   alt={comment.user.name || "User"}
                   width={40}
                   height={40}
@@ -48,15 +49,23 @@ export default function DialogDetailDiscussion({
             </div>
             <div className="space-y-1 flex-1">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                <p className="font-semibold">{comment.user?.name || "Anonim"}</p>
+                <p className="font-semibold">
+                  {comment.user?.name || "Anonim"}
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  {format(new Date(comment.created_at), "EEEE, d MMM yyyy, HH:mm", {
-                    locale: id,
-                  })}
+                  {format(
+                    new Date(comment.created_at),
+                    "EEEE, d MMM yyyy, HH:mm",
+                    {
+                      locale: id,
+                    },
+                  )}
                 </p>
               </div>
-              <p className="text-sm mt-2 whitespace-pre-wrap">{comment.content}</p>
-              
+              <p className="text-sm mt-2 whitespace-pre-wrap">
+                {comment.content}
+              </p>
+
               {comment.material_content?.title && (
                 <div className="mt-4 pt-4 border-t border-border">
                   <p className="text-xs font-medium text-muted-foreground">
@@ -73,9 +82,14 @@ export default function DialogDetailDiscussion({
           {/* Replies */}
           {comment.replies && comment.replies.length > 0 && (
             <div className="space-y-4 ml-8">
-              <h4 className="text-sm font-semibold text-muted-foreground">Balasan:</h4>
+              <h4 className="text-sm font-semibold text-muted-foreground">
+                Balasan:
+              </h4>
               {comment.replies.map((reply) => (
-                <div key={reply.id} className="flex items-start gap-4 p-3 border rounded-lg">
+                <div
+                  key={reply.id}
+                  className="flex items-start gap-4 p-3 border rounded-lg"
+                >
                   <div className="flex-shrink-0">
                     {reply.user?.profile_picture ? (
                       <Image
@@ -93,14 +107,22 @@ export default function DialogDetailDiscussion({
                   </div>
                   <div className="space-y-1 flex-1">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                      <p className="font-semibold text-sm">{reply.user?.name || "Anonim"}</p>
+                      <p className="font-semibold text-sm">
+                        {reply.user?.name || "Anonim"}
+                      </p>
                       <p className="text-[10px] text-muted-foreground">
-                        {format(new Date(reply.created_at), "dd MMM yyyy, HH:mm", {
-                          locale: id,
-                        })}
+                        {format(
+                          new Date(reply.created_at),
+                          "dd MMM yyyy, HH:mm",
+                          {
+                            locale: id,
+                          },
+                        )}
                       </p>
                     </div>
-                    <p className="text-sm mt-1 whitespace-pre-wrap">{reply.content}</p>
+                    <p className="text-sm mt-1 whitespace-pre-wrap">
+                      {reply.content}
+                    </p>
                   </div>
                 </div>
               ))}
