@@ -44,7 +44,7 @@ export default function CardListMaterialContent({
             href={
               pathname.includes("/admin/")
                 ? `/dashboard/admin/material-contents/${materialContent.id}`
-                : `${pathname}/contents/${materialContent.id}`
+                : `${pathname}/${materialContent.id}`
             }
             key={materialContent.id}
             className="group block"
