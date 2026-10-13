@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "api-nusadakwah.creatify.id",
+        hostname: "api-nusadakwah.brilliahib.dev",
         pathname: "/**",
       },
     ],
