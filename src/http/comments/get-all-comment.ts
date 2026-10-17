@@ -26,10 +26,11 @@ export const GetAllCommentHandler = async (
 export const useGetAllComment = (
   id: number,
   token: string,
+  viewerKey: string,
   options?: Partial<UseQueryOptions<GetAllCommentResponse, AxiosError>>
 ) => {
   return useQuery({
-    queryKey: ["get-all-comments", id],
+    queryKey: ["get-all-comments", id, viewerKey],
     queryFn: () => GetAllCommentHandler(id, token),
     ...options,
   });

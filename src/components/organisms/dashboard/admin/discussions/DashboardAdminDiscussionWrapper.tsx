@@ -7,6 +7,7 @@ import SearchBar from "@/components/atoms/search/Searchbar";
 import { DataTable } from "@/components/molecules/datatable/DataTable";
 import { useDeleteComment } from "@/http/comments/delete-comment";
 import { useGetComment } from "@/http/comments/get-comment";
+import { CommentModerationStatus, useModerateComment } from "@/http/comments/moderate-comment";
 import { Comment } from "@/types/comments/comment";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
@@ -28,7 +29,8 @@ export default function DashboardAdminDiscussionWrapper() {
 
   const queryClient = useQueryClient();
 
-  const { data, isPending } = useGetComment(session?.access_token as string, {
+  const viewerKey = `${session?.user?.id ?? "anonymous"}:${session?.user?.role ?? ""}`;
+  const { data, isPending } = useGetComment(session?.access_token as string, viewerKey, {
     enabled: status === "authenticated",
   });
 
@@ -51,7 +53,13 @@ export default function DashboardAdminDiscussionWrapper() {
         item.user.name.toLowerCase().includes(searchInput.toLowerCase()))
   );
 
-  const { mutate: deleteDiscussion, isPending: isDeleting } = useDeleteComment({
+  filteredData.sort((left, right) => {
+    if (left.status === "pending" && right.status !== "pending") return -1;
+    if (right.status === "pending" && left.status !== "pending") return 1;
+    return new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
+  });
+
+  const { mutate: deleteDiscussion } = useDeleteComment({
     onError: (error) => {
       toast.error("Gagal menghapus komentar!", {
         description: getErrorMessage(error),
@@ -66,6 +74,30 @@ export default function DashboardAdminDiscussionWrapper() {
       });
     },
   });
+
+  const { mutate: moderateDiscussion, isPending: isModerating } = useModerateComment({
+    onError: (error) => {
+      queryClient.invalidateQueries({ queryKey: ["get-comment"] });
+      if (error.response?.status === 409) {
+        toast.error("Diskusi ini sudah ditinjau admin lain.", {
+          description: "Daftar diskusi telah diperbarui.",
+        });
+        return;
+      }
+      toast.error("Gagal memperbarui status diskusi.", {
+        description: getErrorMessage(error),
+      });
+    },
+    onSuccess: (_response, variables) => {
+      toast.success(variables.status === "approved" ? "Diskusi disetujui." : "Diskusi ditolak.");
+      queryClient.invalidateQueries({ queryKey: ["get-comment"] });
+      queryClient.invalidateQueries({ queryKey: ["get-all-comments"] });
+    },
+  });
+
+  const moderateDiscussionHandler = (data: Comment, nextStatus: CommentModerationStatus) => {
+    moderateDiscussion({ id: data.id, status: nextStatus });
+  };
 
   const handleDeleteDiscussion = () => {
     if (selectedDeleteDiscussion) {
@@ -90,6 +122,8 @@ export default function DashboardAdminDiscussionWrapper() {
         columns={discussionsColumns({
           deleteDiscussionHandler,
           viewDetailHandler,
+          moderateDiscussionHandler,
+          isModerating,
         })}
         isLoading={isPending}
       />

@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+import CommentModerationBadge from "@/components/atoms/CommentModerationBadge";
 
 interface CardListCommentProps {
   data?: Comment[];
@@ -69,6 +70,9 @@ function CommentCard({
                     <Badge className="bg-green-600 hover:bg-green-600 text-white text-[10px] font-medium px-2 py-0 rounded-full h-4">
                       Anda
                     </Badge>
+                  )}
+                  {isOwner && comment.status !== "approved" && (
+                    <CommentModerationBadge status={comment.status} />
                   )}
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">{timeAgo}</p>
