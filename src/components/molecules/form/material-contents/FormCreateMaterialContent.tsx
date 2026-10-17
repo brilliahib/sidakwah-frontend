@@ -32,6 +32,7 @@ import { useGetAllSubModules } from "@/http/sub-modules/get-all-sub-modules";
 import { convertYoutubeToEmbed } from "@/lib/convert-yt";
 import { cn } from "@/lib/utils";
 import { MaterialContentType } from "@/validators/material-contents/material-content-validator";
+import { MaterialSubmissionAction } from "@/types/material-contents/material-content";
 import { Check, ChevronsUpDown, CloudUpload, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -106,8 +107,12 @@ export default function FormCreateMaterialContent() {
 
   const { mutate: createMaterialContentHandler, isPending } =
     useCreateMaterialContent({
-      onSuccess: () => {
-        toast.success("Berhasil menambahkan konten materi baru!");
+      onSuccess: (_response, variables) => {
+        toast.success(
+          variables.action === "submit"
+            ? "Konten materi dikirim untuk persetujuan Ustadz."
+            : "Draft konten materi berhasil disimpan.",
+        );
         router.push("/dashboard/admin/material-contents");
       },
       onError: () => {
@@ -115,9 +120,10 @@ export default function FormCreateMaterialContent() {
       },
     });
 
-  const onSubmit = (data: MaterialContentType) => {
+  const onSubmit = (data: MaterialContentType, action: MaterialSubmissionAction) => {
     createMaterialContentHandler({
       ...data,
+      action,
       youtube_link: isVideoActive
         ? convertYoutubeToEmbed(data.youtube_link)
         : undefined,
@@ -131,7 +137,7 @@ export default function FormCreateMaterialContent() {
     <Card>
       <CardContent>
         <Form {...form}>
-          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+          <form className="space-y-6" onSubmit={form.handleSubmit((data) => onSubmit(data, "submit"))}>
             <FormField
               control={form.control}
               name="title"
@@ -371,9 +377,17 @@ export default function FormCreateMaterialContent() {
               </>
             )}
 
-            <div className="flex justify-end">
+            <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending}
+                onClick={() => form.handleSubmit((data) => onSubmit(data, "save_draft"))()}
+              >
+                Simpan Draft
+              </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Loading..." : "Tambahkan"}
+                {isPending ? "Mengirim..." : "Kirim untuk Persetujuan"}
               </Button>
             </div>
           </form>

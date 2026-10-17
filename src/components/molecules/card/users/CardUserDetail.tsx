@@ -1,14 +1,21 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { User } from "@/types/user/user";
+import { Button } from "@/components/ui/button";
+import type { User } from "@/types/user/user";
 import { generateFallbackFromName } from "@/utils/generate-name";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
 
 interface CardUserDetailProps {
   data?: User;
+  onToggleUstadz?: () => void;
+  isUpdatingRole?: boolean;
 }
 
-export default function CardUserDetail({ data }: CardUserDetailProps) {
+export default function CardUserDetail({
+  data,
+  onToggleUstadz,
+  isUpdatingRole = false,
+}: CardUserDetailProps) {
   return (
     <Card>
       <CardContent>
@@ -48,6 +55,25 @@ export default function CardUserDetail({ data }: CardUserDetailProps) {
           <div className="flex flex-col gap-1">
             <span className="text-muted-foreground">Role</span>
             <h3 className="font-medium capitalize">{data?.role}</h3>
+            {onToggleUstadz && data && data.role !== "admin" && (
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Ustadz dapat meninjau pengajuan dan melihat seluruh materi.
+                </p>
+                <Button
+                  type="button"
+                  variant={data.role === "ustadz" ? "outline" : "default"}
+                  disabled={isUpdatingRole}
+                  onClick={onToggleUstadz}
+                >
+                  {isUpdatingRole
+                    ? "Menyimpan..."
+                    : data.role === "ustadz"
+                      ? "Cabut Peran Ustadz"
+                      : "Jadikan Ustadz"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

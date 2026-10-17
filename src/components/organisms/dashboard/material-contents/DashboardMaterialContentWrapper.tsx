@@ -33,7 +33,7 @@ export default function DashboardMaterialContentWrapper({
     });
 
   const filteredData = (data?.data ?? []).filter((item: MaterialContent) =>
-    item.title.toLowerCase().includes(searchInput.toLowerCase())
+    (item.title ?? "").toLowerCase().includes(searchInput.toLowerCase())
   );
 
   return (

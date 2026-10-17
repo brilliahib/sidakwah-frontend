@@ -3,15 +3,19 @@ import { AxiosError } from "axios";
 import { api } from "@/lib/axios";
 import { useSession } from "next-auth/react";
 import { MaterialContentType } from "@/validators/material-contents/material-content-validator";
+import { MaterialSubmissionAction } from "@/types/material-contents/material-content";
+
+type CreateMaterialContentInput = MaterialContentType & { action: MaterialSubmissionAction };
 
 export const createMaterialContentHandler = async (
-  body: MaterialContentType,
+  body: CreateMaterialContentInput,
   token: string
 ) => {
   const formData = new FormData();
 
   formData.append("sub_modul_id", body.sub_modul_id.toString());
   formData.append("title", body.title);
+  formData.append("action", body.action);
 
   if (body.youtube_link) {
     formData.append("youtube_link", body.youtube_link);
@@ -39,7 +43,7 @@ export const createMaterialContentHandler = async (
 };
 
 export const useCreateMaterialContent = (
-  options?: UseMutationOptions<unknown, AxiosError, MaterialContentType>
+  options?: UseMutationOptions<unknown, AxiosError, CreateMaterialContentInput>
 ) => {
   const { data: sessionData } = useSession();
   return useMutation({

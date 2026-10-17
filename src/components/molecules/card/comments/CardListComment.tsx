@@ -42,7 +42,7 @@ function CommentCard({
 
   return (
     <Link
-      href={`/dashboard/modules/${comment.material_content?.sub_modul.modul.id}/contents/${comment.material_content_id}`}
+      href={`/dashboard/modules/${comment.material_content?.sub_modul?.modul?.id ?? ""}/contents/${comment.material_content_id}`}
       className="block"
     >
       <Card className="border-slate-200 rounded-2xl shadow-none relative overflow-hidden group transition-shadow duration-200 hover:border-green-600">

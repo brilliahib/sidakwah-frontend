@@ -74,7 +74,7 @@ export default function DashboardMaterialContentDetailWrapper({
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
-        <DashboardTitle title={data?.data.title} isPending={isPending} />
+        <DashboardTitle title={data?.data.title ?? undefined} isPending={isPending} />
         {session?.user?.role === "admin" && (
           <div className="flex gap-2 shrink-0">
             <Button variant="outline" size="sm" asChild>

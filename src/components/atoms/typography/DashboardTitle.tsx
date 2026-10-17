@@ -14,7 +14,7 @@ export default function DashboardTitle({
   title,
   isPending = false,
 }: DashboardTitleProps) {
-  const [time, setTime] = useState(Date.now());
+  const [time, setTime] = useState(0);
 
   useEffect(() => {
     if (isPending) return;
