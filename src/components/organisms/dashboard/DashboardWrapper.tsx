@@ -16,10 +16,17 @@ export default function DashboardWrapper() {
       router.push("/login");
     } else if (session.user.role === "admin") {
       router.push("/dashboard/admin");
+    } else if (session.user.role === "ustadz") {
+      router.push("/dashboard/ustadz");
     }
   }, [session, status, router]);
 
-  if (status === "loading" || !session || session.user.role === "admin") {
+  if (
+    status === "loading" ||
+    !session ||
+    session.user.role === "admin" ||
+    session.user.role === "ustadz"
+  ) {
     return null;
   }
 

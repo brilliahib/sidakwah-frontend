@@ -4,10 +4,13 @@ import { api } from "@/lib/axios";
 import { useSession } from "next-auth/react";
 import { MaterialContentType } from "@/validators/material-contents/material-content-validator";
 import { ErrorResponse } from "@/types/metadata/metadata";
+import { MaterialSubmissionAction } from "@/types/material-contents/material-content";
+
+type UpdateMaterialContentInput = MaterialContentType & { action: MaterialSubmissionAction };
 
 export const UpdateMaterialContentHandler = async (
   id: number,
-  body: MaterialContentType,
+  body: UpdateMaterialContentInput,
   token: string,
 ) => {
   const formData = new FormData();
@@ -15,6 +18,7 @@ export const UpdateMaterialContentHandler = async (
   formData.append("_method", "PUT");
   formData.append("sub_modul_id", String(body.sub_modul_id));
   formData.append("title", body.title);
+  formData.append("action", body.action);
 
   if (body.youtube_link) {
     formData.append("youtube_link", body.youtube_link);
@@ -52,13 +56,13 @@ export const useUpdateMaterialContent = (
   options?: UseMutationOptions<
     unknown,
     AxiosError<ErrorResponse>,
-    { id: number; body: MaterialContentType }
+    { id: number; body: UpdateMaterialContentInput }
   >,
 ) => {
   const { data: sessionData } = useSession();
 
   return useMutation({
-    mutationFn: (params: { id: number; body: MaterialContentType }) =>
+    mutationFn: (params: { id: number; body: UpdateMaterialContentInput }) =>
       UpdateMaterialContentHandler(
         params.id,
         params.body,

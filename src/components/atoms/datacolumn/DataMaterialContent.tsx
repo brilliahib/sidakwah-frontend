@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { Eye, FilePlay, SquarePen, Trash2, Video } from "lucide-react";
+import { Eye, FilePlay, SquarePen, Trash2 } from "lucide-react";
 import ActionButton from "@/components/molecules/datatable/ActionButton";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -32,7 +32,7 @@ export const materialContentColumns = (
     header: "Judul",
     cell: ({ row }) => (
       <p suppressHydrationWarning className="line-clamp-1 md:line-clamp-2">
-        {row.original.title}
+        {row.original.title ?? "Belum ada judul"}
       </p>
     ),
   },
@@ -41,9 +41,45 @@ export const materialContentColumns = (
     header: "Sub Modul Dari",
     cell: ({ row }) => (
       <p suppressHydrationWarning className="line-clamp-1 md:line-clamp-2">
-        {row.original.sub_modul.title}
+        {row.original.sub_modul?.title ?? "Belum dipilih"}
       </p>
     ),
+  },
+  {
+    id: "publication_status",
+    header: "Publikasi",
+    cell: ({ row }) => (
+      <Badge variant={row.original.published_at ? "default" : "outline"}>
+        {row.original.published_at ? "Terbit" : "Belum terbit"}
+      </Badge>
+    ),
+  },
+  {
+    id: "review_status",
+    header: "Persetujuan",
+    cell: ({ row }) => {
+      const status = row.original.latest_revision?.status;
+      const label = {
+        draft: "Draft",
+        pending: "Menunggu Ustadz",
+        approved: "Disetujui",
+        rejected: "Ditolak",
+        superseded: "Digantikan",
+      } as const;
+
+      return status ? (
+        <div className="space-y-1">
+          <Badge variant={status === "rejected" ? "destructive" : status === "pending" ? "secondary" : "outline"}>
+            {label[status]}
+          </Badge>
+          {status === "rejected" && row.original.latest_revision?.rejection_reason && (
+            <p className="max-w-48 whitespace-normal text-xs text-muted-foreground">
+              {row.original.latest_revision.rejection_reason}
+            </p>
+          )}
+        </div>
+      ) : <span className="text-muted-foreground">-</span>;
+    },
   },
   {
     accessorKey: "youtube_link",

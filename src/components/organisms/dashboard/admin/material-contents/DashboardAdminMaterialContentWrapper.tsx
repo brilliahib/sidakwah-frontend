@@ -38,7 +38,7 @@ export default function DashboardAdminMaterialContentWrapper() {
   );
 
   const filteredData = (data?.data ?? []).filter((item: MaterialContent) =>
-    item.title.toLowerCase().includes(searchInput.toLowerCase()),
+    (item.title ?? "").toLowerCase().includes(searchInput.toLowerCase()),
   );
 
   const { mutate: deleteMaterialContent } = useDeleteMaterialContent({

@@ -46,8 +46,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Check, ChevronsUpDown, CloudUpload, Trash2 } from "lucide-react";
 import { MaterialContent } from "@/types/material-contents/material-content";
+import { MaterialSubmissionAction } from "@/types/material-contents/material-content";
 import { getErrorMessage } from "@/utils/error-response";
 import { getImagePreviewUrl } from "@/utils/get-image-preview";
+import { getMaterialContentRevisionImage } from "@/http/material-contents/get-material-content-revisions";
 
 interface FormUpdateMaterialContentProps {
   data?: MaterialContent;
@@ -125,12 +127,24 @@ export default function FormUpdateMaterialContent({
     setIsVideoActive(hasVideo);
     setIsArticleActive(hasArticle);
 
-    if (data.article_images) {
-      setImageUrlPreview(getImagePreviewUrl(data.article_images));
-    } else {
-      setImageUrlPreview(null);
+    if (data.latest_revision?.article_images && data.latest_revision.id && session?.access_token) {
+      let active = true;
+      let objectUrl: string | null = null;
+      void getMaterialContentRevisionImage(data.latest_revision.id, session.access_token).then((blob) => {
+        if (!active) return;
+        objectUrl = URL.createObjectURL(blob);
+        setImageUrlPreview(objectUrl);
+      }).catch(() => {
+        if (active) setImageUrlPreview(null);
+      });
+      return () => {
+        active = false;
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+      };
     }
-  }, [data, defaultValues, form]);
+
+    setImageUrlPreview(data.article_images ? getImagePreviewUrl(data.article_images) : null);
+  }, [data, defaultValues, form, session?.access_token]);
 
   const handleVideoToggle = (checked: boolean) => {
     setIsVideoActive(checked);
@@ -173,8 +187,12 @@ export default function FormUpdateMaterialContent({
 
   const { mutate: updateMaterialContentHandler, isPending } =
     useUpdateMaterialContent({
-      onSuccess: () => {
-        toast.success("Berhasil memperbarui konten materi!");
+      onSuccess: (_response, variables) => {
+        toast.success(
+          variables.body.action === "submit"
+            ? "Perubahan dikirim untuk persetujuan Ustadz."
+            : "Draft perubahan berhasil disimpan.",
+        );
         queryClient.invalidateQueries({
           queryKey: ["get-all-material-contents"],
         });
@@ -187,11 +205,12 @@ export default function FormUpdateMaterialContent({
       },
     });
 
-  const onSubmit = (values: MaterialContentType) => {
+  const onSubmit = (values: MaterialContentType, action: MaterialSubmissionAction) => {
     updateMaterialContentHandler({
       id,
       body: {
         ...values,
+        action,
         youtube_link: isVideoActive
           ? convertYoutubeToEmbed(values.youtube_link)
           : undefined,
@@ -206,7 +225,7 @@ export default function FormUpdateMaterialContent({
     <Card>
       <CardContent>
         <Form {...form}>
-          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+          <form className="space-y-6" onSubmit={form.handleSubmit((values) => onSubmit(values, "submit"))}>
             <FormField
               control={form.control}
               name="title"
@@ -444,9 +463,17 @@ export default function FormUpdateMaterialContent({
               </>
             )}
 
-            <div className="flex justify-end">
+            <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending}
+                onClick={() => form.handleSubmit((values) => onSubmit(values, "save_draft"))()}
+              >
+                Simpan Draft
+              </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Loading..." : "Simpan Perubahan"}
+                {isPending ? "Mengirim..." : "Kirim untuk Persetujuan"}
               </Button>
             </div>
           </form>

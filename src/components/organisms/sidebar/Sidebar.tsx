@@ -33,6 +33,18 @@ interface SidebarWrapperProps {
 
 export function SidebarWrapper({ session }: SidebarWrapperProps) {
   const pathname = usePathname();
+  const dashboardHref =
+    session.user.role === "admin"
+      ? "/dashboard/admin"
+      : session.user.role === "ustadz"
+        ? "/dashboard/ustadz"
+        : "/dashboard";
+  const dashboardLabel =
+    session.user.role === "admin"
+      ? "Dashboard Admin"
+      : session.user.role === "ustadz"
+        ? "Dashboard Ustadz"
+        : "Dashboard";
 
   const buttonClass = (href: string) =>
     `hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-900 ${
@@ -70,27 +82,14 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
                 <SidebarMenuButton
                   asChild
                   className={`hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-900 ${
-                    pathname ===
-                    (session?.user.role === "admin"
-                      ? "/dashboard/admin"
-                      : "/dashboard")
+                    pathname === dashboardHref
                       ? "bg-primary/10 text-primary dark:bg-slate-800"
                       : ""
                   }`}
                 >
-                  <Link
-                    href={
-                      session?.user.role === "admin"
-                        ? "/dashboard/admin"
-                        : "/dashboard"
-                    }
-                  >
+                  <Link href={dashboardHref}>
                     <LayoutDashboard />
-                    <span>
-                      {session?.user.role === "admin"
-                        ? "Dashboard Admin"
-                        : "Dashboard"}
-                    </span>
+                    <span>{dashboardLabel}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -174,6 +173,27 @@ export function SidebarWrapper({ session }: SidebarWrapperProps) {
               </SidebarGroupContent>
             </SidebarGroup>
           </>
+        )}
+
+        {session.user.role === "ustadz" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={buttonClass("/dashboard/ustadz/material-contents")}
+                  >
+                    <Link href="/dashboard/ustadz/material-contents">
+                      <File />
+                      <span>Konten Materi</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
 
         {/* user roles groups */}
