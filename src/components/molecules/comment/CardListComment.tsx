@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
+import { UseMutateFunction } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { Session } from "next-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import {
   MessageSquare,
-  MoreVertical,
   Reply,
   Send,
   Loader2,
@@ -106,8 +108,8 @@ interface CommentItemProps {
   replyForm: UseFormReturn<CommentType>;
   onSubmitReply: (values: CommentType) => void;
   isCreatingReply: boolean;
-  session: any;
-  deleteComment: any;
+  session: Session | null;
+  deleteComment: UseMutateFunction<unknown, AxiosError, { id: number }, unknown>;
   isDeleting: boolean;
 }
 
