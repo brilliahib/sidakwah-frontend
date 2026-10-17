@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye, Trash2 } from "lucide-react";
+import { Check, Eye, Trash2, X } from "lucide-react";
 import ActionButton from "@/components/molecules/datatable/ActionButton";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -10,10 +10,14 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Comment } from "@/types/comments/comment";
+import { CommentModerationStatus } from "@/http/comments/moderate-comment";
+import CommentModerationBadge from "@/components/atoms/CommentModerationBadge";
 
 interface DataDiscussionsProps {
   deleteDiscussionHandler: (data: Comment) => void;
   viewDetailHandler: (data: Comment) => void;
+  moderateDiscussionHandler: (data: Comment, status: CommentModerationStatus) => void;
+  isModerating: boolean;
 }
 
 export const discussionsColumns = (
@@ -54,6 +58,11 @@ export const discussionsColumns = (
     ),
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <CommentModerationBadge status={row.original.status} />,
+  },
+  {
     accessorKey: "created_at",
     header: "Tanggal",
     cell: ({ row }) => (
@@ -82,6 +91,24 @@ export const discussionsColumns = (
               <span className="ml-2">Detail</span>
             </div>
           </DropdownMenuItem>
+          {data.status === "pending" && (
+            <>
+              <DropdownMenuItem
+                disabled={props.isModerating}
+                onSelect={() => props.moderateDiscussionHandler(data, "approved")}
+              >
+                <Check className="h-4 w-4 text-primary" />
+                <span className="ml-2">Setujui</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={props.isModerating}
+                onSelect={() => props.moderateDiscussionHandler(data, "rejected")}
+              >
+                <X className="h-4 w-4 text-destructive" />
+                <span className="ml-2">Tolak</span>
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuItem>
             <div
               className="flex cursor-pointer items-center text-red-600 hover:text-red-800 hover:underline w-full"

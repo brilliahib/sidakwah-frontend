@@ -15,6 +15,10 @@ import Link from "next/link";
 import { useDeleteMaterialContent } from "@/http/material-contents/delete-material-content";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Comment } from "@/types/comments/comment";
+import { Badge } from "@/components/ui/badge";
+import { useGetMyMaterialCommentStatus } from "@/http/comments/get-my-material-comment-status";
+import { useState } from "react";
 
 interface DashboardMaterialContentDetailWrapperProps {
   contentId: number;
@@ -24,6 +28,8 @@ export default function DashboardMaterialContentDetailWrapper({
   contentId,
 }: DashboardMaterialContentDetailWrapperProps) {
   const { data: session, status } = useSession();
+  const [activeTab, setActiveTab] = useState("discussion");
+  const viewerKey = `${session?.user?.id ?? "anonymous"}:${session?.user?.role ?? ""}`;
   const router = useRouter();
 
   const { data, isPending } = useGetDetailMaterialContent(
@@ -37,9 +43,17 @@ export default function DashboardMaterialContentDetailWrapper({
   const { data: comment, isPending: isCommentPending } = useGetAllComment(
     contentId,
     session?.access_token as string,
+    viewerKey,
     {
       enabled: status === "authenticated",
     },
+  );
+
+  const { data: ownCommentStatus } = useGetMyMaterialCommentStatus(
+    contentId,
+    session?.access_token as string,
+    viewerKey,
+    { enabled: status === "authenticated" },
   );
 
   const articleImage = data?.data.article_images
@@ -100,9 +114,10 @@ export default function DashboardMaterialContentDetailWrapper({
         )}
 
         <div>
-          <Tabs defaultValue="discussion">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="discussion">Forum Diskusi</TabsTrigger>
+              {session?.user?.id && <TabsTrigger value="my-status">Status Saya</TabsTrigger>}
               <TabsTrigger value="article">Artikel</TabsTrigger>
             </TabsList>
 
@@ -111,8 +126,15 @@ export default function DashboardMaterialContentDetailWrapper({
                 data={comment?.data}
                 materialContentId={contentId}
                 isLoading={isCommentPending}
+                onCommentSubmitted={() => setActiveTab("my-status")}
               />
             </TabsContent>
+
+            {session?.user?.id && (
+              <TabsContent value="my-status">
+                <AuthorModerationNotice comments={ownCommentStatus?.data ?? []} />
+              </TabsContent>
+            )}
 
             {data?.data.article_content && (
               <TabsContent value="article" className="space-y-4">
@@ -148,6 +170,36 @@ export default function DashboardMaterialContentDetailWrapper({
           </Tabs>
         </div>
       </div>
+    </div>
+  );
+
+}
+
+function AuthorModerationNotice({
+  comments,
+}: {
+  comments: Comment[];
+}) {
+  if (comments.length === 0) {
+    return <p className="rounded-lg border p-6 text-center text-sm text-muted-foreground">Belum ada diskusi yang menunggu peninjauan.</p>;
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium">Status diskusi Anda</p>
+      <ul className="space-y-3">
+        {comments.map((item) => (
+          <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card p-4 text-sm">
+            <span className="line-clamp-1 min-w-0 flex-1 text-muted-foreground">{item.content}</span>
+            <Badge
+              variant={item.status === "rejected" ? "destructive" : "secondary"}
+              className={item.status === "pending" ? "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200" : ""}
+            >
+              {item.status === "pending" ? "Menunggu persetujuan" : "Ditolak"}
+            </Badge>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

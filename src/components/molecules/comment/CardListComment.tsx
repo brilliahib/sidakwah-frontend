@@ -39,6 +39,7 @@ interface CardListCommentProps {
   data?: Comment[];
   materialContentId: number;
   isLoading?: boolean;
+  onCommentSubmitted?: () => void;
 }
 
 const formatTimeAgo = (date: Date) => {
@@ -326,6 +327,7 @@ export default function CardListComment({
   data,
   materialContentId,
   isLoading = false,
+  onCommentSubmitted,
 }: CardListCommentProps) {
   const { data: session } = useSession();
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
@@ -377,7 +379,8 @@ export default function CardListComment({
   const { mutate: createComment, isPending: isCreatingComment } =
     useCreateComment({
       onSuccess: () => {
-        toast.success("Komentar berhasil ditambahkan!");
+        toast.success("Komentar dikirim dan menunggu persetujuan admin.");
+        onCommentSubmitted?.();
         mainCommentForm.reset();
         queryClient.invalidateQueries({
           queryKey: ["get-all-comments", materialContentId],
@@ -390,7 +393,8 @@ export default function CardListComment({
 
   const { mutate: createReply, isPending: isCreatingReply } = useCreateComment({
     onSuccess: () => {
-      toast.success("Balasan berhasil ditambahkan!");
+      toast.success("Balasan dikirim dan menunggu persetujuan admin.");
+      onCommentSubmitted?.();
       replyForm.reset();
       setReplyingTo(null);
       queryClient.invalidateQueries({

@@ -8,6 +8,10 @@ export interface Comment {
   parent_id: number | null;
   user: User;
   content: string;
+  status: "pending" | "approved" | "rejected";
+  moderated_by: number | null;
+  moderated_at: Date | null;
+  moderator?: Pick<User, "id" | "name"> | null;
   replies?: Comment[];
   created_at: Date;
   updated_at: Date;
