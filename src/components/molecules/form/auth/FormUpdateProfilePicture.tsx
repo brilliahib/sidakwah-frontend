@@ -24,14 +24,6 @@ export default function FormUpdateProfilePicture() {
   const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    if (session?.user?.profile_picture) {
-      setPreview(getImagePreviewUrl(session.user.profile_picture));
-    } else {
-      setPreview(null);
-    }
-  }, [session?.user?.profile_picture]);
-
-  useEffect(() => {
     return () => {
       if (preview?.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
@@ -88,6 +80,11 @@ export default function FormUpdateProfilePicture() {
 
   const fallbackName =
     session?.user?.name?.trim().charAt(0)?.toUpperCase() ?? "U";
+  const displayPreview = selectedFile
+    ? preview
+    : session?.user?.profile_picture
+      ? getImagePreviewUrl(session.user.profile_picture)
+      : null;
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -104,8 +101,8 @@ export default function FormUpdateProfilePicture() {
           </div>
         ) : (
           <Avatar className="h-42 w-42 rounded-full border">
-            {preview ? (
-              <AvatarImage src={preview} alt="Preview Foto Profil" />
+            {displayPreview ? (
+              <AvatarImage src={displayPreview} alt="Foto profil" />
             ) : (
               <AvatarFallback className="rounded-full">
                 <span className="text-4xl font-bold">{fallbackName}</span>
